@@ -7,19 +7,19 @@
 
 OpenShift 是一款容器应用平台，它将 Docker 和 Kubernetes 技术带入企业。
 
- ![image](https://github.com/jinyuchen724/openshift/raw/master/架构介绍/architecture_overview.png)
+ ![image](https://github.com/jinyuchen724/openshift/raw/master/openshift集群安装/架构介绍/architecture_overview.png)
  
 上图是openshift origin 总体架构图
 
-![image](https://github.com/jinyuchen724/openshift/raw/master/架构介绍/openshift_k8s.jpg)
+![image](https://github.com/jinyuchen724/openshift/raw/master/openshift集群安装/架构介绍/openshift_k8s.jpg)
 
 上图是 openshift 和 k8s 所在容器云平台的关系
 
 ## 主服务和计算节点关系结构
 
-![image](https://github.com/jinyuchen724/openshift/raw/master/架构介绍/all_in_one.png)
+![image](https://github.com/jinyuchen724/openshift/raw/master/openshift集群安装/架构介绍/all_in_one.png)
 
-![image](https://github.com/jinyuchen724/openshift/raw/master/架构介绍/master-node.jpg)
+![image](https://github.com/jinyuchen724/openshift/raw/master/openshift集群安装/架构介绍/master-node.jpg)
 
 **主服务器(Masters)依赖于基于etcd的分布式目录， 主要用来提供配置共享和服务发现**
 
@@ -27,11 +27,11 @@ OpenShift 是一款容器应用平台，它将 Docker 和 Kubernetes 技术带�
 
 ## 整体应用概念介绍
 
-![image](https://github.com/jinyuchen724/openshift/raw/master/架构介绍/openshift-app2.jpg)
+![image](https://github.com/jinyuchen724/openshift/raw/master/openshift集群安装/架构介绍/openshift-app2.jpg)
 
-![image](https://github.com/jinyuchen724/openshift/raw/master/架构介绍/opensift_app.png)
+![image](https://github.com/jinyuchen724/openshift/raw/master/openshift集群安装/架构介绍/opensift_app.png)
 
-![image](https://github.com/jinyuchen724/openshift/raw/master/架构介绍/k8s_arch.jpg)
+![image](https://github.com/jinyuchen724/openshift/raw/master/openshift集群安装/架构介绍/k8s_arch.jpg)
 
 上述应用架构图中， 概念来源于Kubernetes的概念， 需要明白以下主要的对象。
 
