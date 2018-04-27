@@ -165,7 +165,7 @@ etcdClientInfo:
   keyFile: master.etcd-client.key
   urls:
     - https://172.16.8.40:2379
-    - https://172.16.8.84.23:2379
+    - https://172.16.8.84:2379
     - https://172.16.8.41:2379
 etcdStorageConfig:
   kubernetesStoragePrefix: kubernetes.io
