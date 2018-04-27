@@ -25,17 +25,17 @@
 首先下载 cfssl，并给予可执行权限，然后扔到 PATH 目录下
 
 ```
-[root@openshift-master1 /opt]# wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
-[root@openshift-master1 /opt]# wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
-[root@openshift-master1 /opt]# chmod +x cfssl_linux-amd64 cfssljson_linux-amd64
-[root@openshift-master1 /opt]# mv cfssl_linux-amd64 /usr/local/bin/cfssl
-[root@openshift-master1 /opt]# mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
+[root@hz01-online-ops-openmasteretc-01 /opt]# wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+[root@hz01-online-ops-openmasteretc-01 /opt]# wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+[root@hz01-online-ops-openmasteretc-01 /opt]# chmod +x cfssl_linux-amd64 cfssljson_linux-amd64
+[root@hz01-online-ops-openmasteretc-01 /opt]# mv cfssl_linux-amd64 /usr/local/bin/cfssl
+[root@hz01-online-ops-openmasteretc-01 /opt]# mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
 ```
 
 - Etcd 证书生成所需配置文件如下:
 
 ```
-[root@openshift-master1 /opt]# cat etcd-root-ca-csr.json 
+[root@hz01-online-ops-openmasteretc-01 /opt]# cat etcd-root-ca-csr.json 
 {
    "key": {
      "algo": "rsa",
@@ -53,7 +53,7 @@
    "CN": "etcd-root-ca"
 }
 
-[root@openshift-master1 /opt]# cat etcd-gencert.json 
+[root@hz01-online-ops-openmasteretc-01 /opt]# cat etcd-gencert.json 
 {
   "signing": {
     "default": {
@@ -68,7 +68,7 @@
   }
 }
 
-[root@openshift-master1 /opt]# cat etcd-csr.json 
+[root@hz01-online-ops-openmasteretc-01 /opt]# cat etcd-csr.json 
 {
   "key": {
     "algo": "rsa",
@@ -87,9 +87,13 @@
   "hosts": [
     "127.0.0.1",
     "localhost",
-    "192.168.124.22",
-    "192.168.124.23",
-    "192.168.124.24"
+    "172.16.8.40",
+    "172.16.8.84",
+    "172.16.8.41",
+    "hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com",
+    "hz01-online-ops-openmasteretc-02.sysadmin.xinguangnet.com",
+    "hz01-online-ops-openmasteretc-03.sysadmin.xinguangnet.com",
+    "openshift.ops.com"
   ]
 }
 ```
@@ -98,12 +102,11 @@
 - 生成 Etcd 证书
 
 ```
-[root@openshift-master1 /opt]# cfssl gencert --initca=true etcd-root-ca-csr.json | cfssljson --bare etcd-root-ca
-[root@openshift-master1 /opt]# cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-gencert.json etcd-csr.json | cfssljson --bare etcd
+[root@hz01-online-ops-openmasteretc-01 /opt]# cfssl gencert --initca=true etcd-root-ca-csr.json | cfssljson --bare etcd-root-ca
+[root@hz01-online-ops-openmasteretc-01 /opt]# cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-gencert.json etcd-csr.json | cfssljson --bare etcd
 
 #生成的证书列表如下
-[root@openshift-master1 /opt]
-# ll 
+[root@hz01-online-ops-openmasteretc-01 /opt]# ll 
 总用量 36
 -rw-r--r-- 1 root root 2033 3月  27 18:09 etcd.csr
 -rw-r--r-- 1 root root  513 3月  27 18:09 etcd-csr.json
@@ -118,35 +121,38 @@
 
 ## 部署 ETCD 集群
 
-### 第一个节点etcd0 安装
+### 第一个节点etcd1 安装
 
 - 安装etcd，并将证书拷贝安装目录，赋权
 
 ```
-[root@openshift-master1 /opt]# yum install etcd -y
-[root@openshift-master1 /opt]# cp *.pem /etc/etcd/
-[root@openshift-master1 /opt]# chown -R etcd:etcd /etc/etcd/
-[root@openshift-master1 /opt]# chmod -R 755 /etc/etcd/
+[root@hz01-online-ops-openmasteretc-01 /opt]# yum install etcd -y
+[root@hz01-online-ops-openmasteretc-01 /opt]# cp *.pem /etc/etcd/
+[root@hz01-online-ops-openmasteretc-01 /opt]# chown -R etcd:etcd /etc/etcd/
+[root@hz01-online-ops-openmasteretc-01 /opt]# chmod -R 755 /etc/etcd/
 ```
 
 - 配置内容
 
 ```
-[root@openshift-master etcd]# cat /etc/etcd/etcd.conf
-#[Member]
-ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
-ETCD_LISTEN_PEER_URLS="https://192.168.124.22:2380"
-ETCD_LISTEN_CLIENT_URLS="https://192.168.124.22:2379,http://localhost:2379"
-ETCD_NAME="etcd0"
+[root@hz01-online-ops-openmasteretc-01 /opt]# cat /etc/etcd/etcd.conf
+#[member]
+ETCD_NAME=hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com
+ETCD_DATA_DIR="/var/lib/etcd/"
 ETCD_HEARTBEAT_INTERVAL=500
 ETCD_ELECTION_TIMEOUT=2500
-#[Clustering]
-ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.124.22:2380"
-ETCD_ADVERTISE_CLIENT_URLS="https://192.168.124.22:2379"
-ETCD_INITIAL_CLUSTER="etcd0=https://192.168.124.22:2380,etcd1=https://192.168.124.23:2380,etcd2=https://192.168.124.24:2380"
-ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_LISTEN_PEER_URLS="https://172.16.8.40:2380"
+ETCD_LISTEN_CLIENT_URLS="https://172.16.8.40:2379,http://127.0.0.1:2379"
+ETCD_MAX_SNAPSHOTS="5"
+ETCD_MAX_WALS="5"
+#[cluster]
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://172.16.8.40:2380"
+#if you use different ETCD_NAME (e.g. test), set ETCD_INITIAL_CLUSTER value for this name, i.e. "test=http://..."
+ETCD_INITIAL_CLUSTER="hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com=https://172.16.8.40:2380,hz01-online-ops-openmasteretc-02.sysadmin.xinguangnet.com=https://172.16.8.84:2380,hz01-online-ops-openmasteretc-03.sysadmin.xinguangnet.com=https://172.16.8.41:2380"
 ETCD_INITIAL_CLUSTER_STATE="new"
-#[Security]
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_ADVERTISE_CLIENT_URLS="https://172.16.8.40:2379"
+# [security]
 ETCD_CERT_FILE="/etc/etcd/etcd.pem"
 ETCD_KEY_FILE="/etc/etcd/etcd-key.pem"
 ETCD_CLIENT_CERT_AUTH="true"
@@ -162,8 +168,8 @@ ETCD_PEER_AUTO_TLS="true"
 - 启动服务
 
 ```
-[root@openshift-master1 /opt]# systemctl enable etcd
-[root@openshift-master1 /opt]# systemctl start etcd
+[root@hz01-online-ops-openmasteretc-01 /opt]# systemctl enable etcd
+[root@hz01-online-ops-openmasteretc-01 /opt]# systemctl start etcd
 ```
 
 ### 其他2个节点安装
@@ -171,20 +177,20 @@ ETCD_PEER_AUTO_TLS="true"
 - 安装 etcd 软件包
 
 ```
-yum install etcd -y
+[root@hz01-online-ops-openmasteretc-02 /opt]# yum install etcd -y
 ```
 - 将第一个节点的配置拷贝到其他2个节点
 
 ```
-[root@openshift-master ~]# cd /etc/etcd/
-[root@openshift-master etcd]# ll
+[root@hz01-online-ops-openmasteretc-01 /opt]# cd /etc/etcd/
+[root@hz01-online-ops-openmasteretc-01 /opt]# ll
 total 20
 -rwxr-xr-x 1 etcd etcd  920 Apr 18 06:11 etcd.conf
 -rwxr-xr-x 1 etcd etcd 3243 Apr 18 06:07 etcd-key.pem
 -rwxr-xr-x 1 etcd etcd 2167 Apr 18 06:07 etcd.pem
 -rwxr-xr-x 1 etcd etcd 3247 Apr 18 06:07 etcd-root-ca-key.pem
 -rwxr-xr-x 1 etcd etcd 2078 Apr 18 06:07 etcd-root-ca.pem
-[root@openshift-master1 etcd]# scp * openshift-master2:/etc/etcd/
+[root@hz01-online-ops-openmasteretc-01 /opt]# scp * openshift-master2:/etc/etcd/
 etcd.conf                                     100%  920     0.9KB/s   00:00
 etcd-key.pem                                  100% 3243     3.2KB/s   00:00
 etcd.pem                                      100% 2167     2.1KB/s   00:00
@@ -194,12 +200,12 @@ etcd-root-ca.pem                              100% 2078     2.0KB/s   00:00
 - 在其他2个节点上修改如下配置项,ip地址改成本节点的对应的IP地址
 
 ```
-ETCD_LISTEN_PEER_URLS="https://192.168.124.23:2380"
-ETCD_LISTEN_CLIENT_URLS="https://192.168.124.23:2379,http://localhost:2379"
+ETCD_LISTEN_PEER_URLS="https://172.16.8.84:2380"
+ETCD_LISTEN_CLIENT_URLS="https://172.16.8.84:2379,http://127.0.0.1:237/"
 #ETCD节点名称 按顺序增加即可
-ETCD_NAME="etcd1"  
-ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.124.23:2380"
-ETCD_ADVERTISE_CLIENT_URLS="https://192.168.124.23:2379"
+ETCD_NAME=hz01-online-ops-openmasteretc-02.sysadmin.xinguangnet.com
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://172.16.8.84:2380"
+ETCD_ADVERTISE_CLIENT_URLS="https://172.16.8.84:2379"
 ```
 
 - 启动服务即可
