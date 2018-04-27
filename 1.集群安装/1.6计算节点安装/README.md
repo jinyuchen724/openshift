@@ -17,13 +17,13 @@
 
 - 安装docker
 ```
-yum install docker -y
+[root@hz01-online-ops-opennode-01 /opt]# yum install docker -y
 ```
 
 - 配置docker
 
 ```
-[root@openshift-node1 node]# cat /etc/docker/daemon.json
+[root@hz01-online-ops-opennode-01 /opt]# cat /etc/docker/daemon.json
 {
  "registry-mirrors": ["http://ef017c13.m.daocloud.io"],
  "insecure-registries": [ "172.30.0.0/16","172.30.102.47:5000","openshift-master1:5000"]
@@ -35,20 +35,20 @@ yum install docker -y
 - 启动docker
 
 ```
-systemctl enable docker
-systemctl start docker
+[root@hz01-online-ops-opennode-01 /opt]# systemctl enable docker
+[root@hz01-online-ops-opennode-01 /opt]# systemctl start docker
 ```
 
 - 安装 node 软件包
 ```
-yum install origin-node origin-sdn-ovs -y
+[root@hz01-online-ops-opennode-01 /opt]# yum install origin-node origin-sdn-ovs -y
 ```
 ## 生成 node 配置文件(默认是没有的) 
 
 - 将master的 ca配置文件 拷贝到 node 节点 (master节点上操作)
 ```
-cd /etc/origin/master/
-scp ca.crt ca.key ca.serial.txt openshift-node1:/etc/origin/node/
+[root@hz01-online-ops-openmasteretc-01 /opt]# cd /etc/origin/master/
+[root@hz01-online-ops-openmasteretc-01 /etc/origin/master]# scp ca.crt ca.key ca.serial.txt openshift-node1:/etc/origin/node/
 ```
 - 在node节点上 生成配置(node节点上操作)
 
@@ -97,18 +97,18 @@ oc adm create-node-config \
 - 启动node节点(确保openshhift.ops.com能够解析或者hosts绑定)
 
 ```
-systemctl enable origin-node
-systemctl start origin-node
+[root@hz01-online-ops-opennode-01 /opt]# systemctl enable origin-node
+[root@hz01-online-ops-opennode-01 /opt]# systemctl start origin-node
 ```
 
 - 检查日志和到服务端确认node注册成功
 
 ```
-[root@openshift-master master]# oc get node
-NAME              STATUS    AGE       VERSION
-openshift-node1   Ready     44s       v1.6.1+5115d708d7
+[root@hz01-online-ops-openmasteretc-01 /etc/origin/master]# oc get node
+NAME                          STATUS    AGE       VERSION
+hz01-online-ops-opennode-01   Ready     12s       v1.6.1+5115d708d7
 
-[root@openshift-master master]# oc get hostsubnet
-NAME              HOST              HOST IP          SUBNET
-openshift-node1   openshift-node1   192.168.124.30   10.128.0.0/23
+[root@hz01-online-ops-openmasteretc-01 /etc/origin/master]# oc get hostsubnet
+NAME                          HOST                          HOST IP        SUBNET
+hz01-online-ops-opennode-01   hz01-online-ops-opennode-01   172.16.8.104   10.128.0.0/23
 ```
