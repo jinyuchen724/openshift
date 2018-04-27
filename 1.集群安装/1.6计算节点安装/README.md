@@ -1,10 +1,3 @@
-+++
-title = "计算节点安装"
-date =  2018-03-30T01:46:28-04:00
-weight = 6
-keywords = "openshift node,架构,docker,部署环境"
-+++
-
 | 版本   |   日期   |   状态  | 修订人    |    摘要   |
 | ------ | ----- | ----- | ------- | ------ |
 | V1.0  | 2018-04-17  | 创建  |  开源方案   |    初始版本  |
@@ -14,9 +7,9 @@ keywords = "openshift node,架构,docker,部署环境"
 
 | 主机角色 | IP地址 |  域名 |
 | ---      | -----  |  ---  |
-| 基础设施节点(Node) | openshift-node1（192.168.124.30） | lb.openshift.ops.com |
-| 计算节点(Node) | openshift-node2（192.168.124.46） | 无对外域名 |
-
+| 基础设施节点(Node) | openshift-node1（172.16.8.104） | *.open-prod.ops.com |
+| 计算节点(Node) | openshift-node2（172.16.8.42） | 无对外域名 |
+| 计算节点(Node) | openshift-node2（172.16.5.109） | 无对外域名 |
 
 ## 安装node节点(计算节点)
 
@@ -62,8 +55,8 @@ scp ca.crt ca.key ca.serial.txt openshift-node1:/etc/origin/node/
 ```
 oc adm create-node-config \
 --node-dir=/etc/origin/node \
---node=openshift-node1 \
---hostnames=openshift-node1,192.168.124.30 \
+--node=hz01-online-ops-opennode-01 \
+--hostnames=hz01-online-ops-opennode-01,172.16.8.104 \
 --certificate-authority="/etc/origin/node/ca.crt"   \
 --signer-cert="/etc/origin/node/ca.crt"   \
 --signer-key="/etc/origin/node/ca.key"   \
@@ -75,9 +68,31 @@ oc adm create-node-config \
 ```
 注意: 如下设置要改成对应计算节点的信息 
 ```
---node=openshift-node1 \
---hostnames=openshift-node1,192.168.124.30 \
+--node=hz01-online-ops-opennode-01 \
+--hostnames=hz01-online-ops-opennode-01,172.16.8.104\
 ```
+
+脚本如下:
+```
+# cat addnode.sh 
+#!/bin/bash
+NODE_NAME=`hostname`
+NODE_IP=`ifconfig eth0 |grep '172' |awk '{print $2}'`
+
+oc adm create-node-config \
+    --node-dir=/etc/origin/node \
+    --node=$NODE_NAME \
+    --hostnames=$NODE_NAME,$NODE_IP \
+    --certificate-authority="/etc/origin/node/ca.crt"   \
+    --signer-cert="/etc/origin/node/ca.crt"   \
+    --signer-key="/etc/origin/node/ca.key"   \
+    --signer-serial="/etc/origin/node/ca.serial.txt" \
+    --node-client-certificate-authority="/etc/origin/node/ca.crt" \
+    --network-plugin="redhat/openshift-ovs-subnet" \
+    --dns-ip='172.30.0.1' \
+    --master='https://openshift.ops.com'
+```
+
 
 - 启动node节点(确保openshhift.ops.com能够解析或者hosts绑定)
 
