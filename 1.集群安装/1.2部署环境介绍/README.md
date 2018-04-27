@@ -5,7 +5,7 @@
 
 ## Openshift v3.6 高可用部署架构图
 
-![image](https://github.com/jinyuchen724/openshift/raw/master/架构介绍/openshift_HA.png)
+![image](https://github.com/jinyuchen724/openshift/raw/master/1.集群安装/1.2部署环境介绍/openshift_HA.png)
 
 * **Masters Node** 负载均衡使用 **HAPROXY** 做基于tcp模式的负载(SSL证书穿透)
 * **Data Store** 是使用etcd作为信息的存储数据库
