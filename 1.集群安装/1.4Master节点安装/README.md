@@ -294,7 +294,7 @@ systemctl restart origin-master
 
 - 将第一个master节点的 ca配置和相关配置文件拷贝到其他master节点上
 ```
-scp ca.* master.etcd-* htpasswd openshift-master2:/etc/origin/master
+scp * openshift-master2:/etc/origin/master
 ```
 
 - 在其他2个节点重新生成配置
