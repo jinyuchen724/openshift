@@ -7,11 +7,11 @@
 
 - etcd集群信息
 
-| 主机名 | IP地址 | 域名 | etcd版本 |
+| 主机名 | IP地址 | 操作系统 | etcd版本 |
 | ---    | -----  |  --- | -------  |
-| etcd0 | 192.168.124.22 | etcd0.51know.info | etcd-3.2.15-1.el7.x86_64 |
-| etcd1 | 192.168.124.23 | etcd1.51know.info | etcd-3.2.15-1.el7.x86_64 |
-| etcd2 | 192.168.124.24 | etcd0.51know.info | etcd-3.2.15-1.el7.x86_64 |
+| hz01-online-ops-openmasteretc-01 | 172.16.8.40 | CentOS Linux release 7.3.1611 (Core) x86_64 | etcd-3.2.7-1.el7.x86_64 |
+| hz01-online-ops-openmasteretc-02 | 172.16.8.84 | CentOS Linux release 7.3.1611 (Core) x86_64 | etcd-3.2.7-1.el7.x86_64 |
+| hz01-online-ops-openmasteretc-03 | 172.16.8.41 | CentOS Linux release 7.3.1611 (Core) x86_64 | etcd-3.2.7-1.el7.x86_64 |
 
 
 - 证书生成
