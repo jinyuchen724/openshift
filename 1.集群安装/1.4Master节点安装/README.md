@@ -7,9 +7,9 @@
 
 | 主机角色 | IP地址 |   负载域名 |
 | ---      | -----  |   ---  |
-| 管理节点(Master)  | openshift-master1(192.168.124.22) | openshift.ops.com |
-| 管理节点(Master)  | openshift-master2(192.168.124.23) | openshift.ops.com |
-| 管理节点(Master)  | openshift-master3(192.168.124.24) | openshift.ops.com |
+| 管理节点(Master)  | master+etcd(172.16.8.40) | openshift.ops.com |
+| 管理节点(Master)  | master+etcd（172.16.8.84） | openshift.ops.com |
+| 管理节点(Master)  | master+etcd(172.16.8.41) | openshift.ops.com |
 
 
 ## 安装前基础环境检查
@@ -164,9 +164,9 @@ etcdClientInfo:
   certFile: master.etcd-client.crt
   keyFile: master.etcd-client.key
   urls:
-    - https://192.168.124.22:2379
-    - https://192.168.124.23:2379
-    - https://192.168.124.24:2379
+    - https://172.16.8.40:2379
+    - https://172.16.8.84.23:2379
+    - https://172.16.8.41:2379
 etcdStorageConfig:
   kubernetesStoragePrefix: kubernetes.io
   kubernetesStorageVersion: v1
@@ -186,7 +186,7 @@ etcdStorageConfig:
 - 拷贝相关证书到master目录
 
 ```
-[root@openshift-master master]# cat /etc/origin/master/master-config.yaml ^C
+[root@openshift-master master]# cat /etc/origin/master/master-config.yaml
 [root@openshift-master master]# cp /etc/etcd/etcd-root-ca.pem /etc/origin/master/master.etcd-ca.crt
 [root@openshift-master master]# cp /etc/etcd/etcd.pem /etc/origin/master/master.etcd-client.crt
 cp: overwrite ‘/etc/origin/master/master.etcd-client.crt’? y
@@ -217,7 +217,7 @@ systemctl start origin-master.service
 [root@openshift-master ~]# mkdir -p /root/.kube
 [root@openshift-master ~]# cp /etc/origin/master/admin.kubeconfig    /root/.kube/config
 [root@openshift-master ~]# oc login -u system:admin
-Logged into "https://192.168.124.22:8443" as "system:admin" using existing credentials.
+Logged into "https://172.16.8.40:8443" as "system:admin" using existing credentials.
 
 You have access to the following projects and can switch between them with 'oc project <projectname>':
 
@@ -264,7 +264,7 @@ system:admin
 - 添加ops账户
 
 ```
-[root@openshift-master master]# htpasswd -c /etc/origin/master/htpasswd ops
+[root@openshift-master master]# htpasswd /etc/origin/master/htpasswd ops
 New password:
 Re-type new password:
 Adding password for user ops
