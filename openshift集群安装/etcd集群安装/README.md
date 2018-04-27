@@ -237,22 +237,22 @@ https://192.168.124.24:2379 is healthy: successfully committed proposal: took = 
 export ETCDCTL_API=3
 ```
 
-1. 获取key
+2. 获取key
 ```
 etcdctl get / --prefix --keys-only
 ```
 
-1. 删除 openshift.io 相关内容
+3. 删除 openshift.io 相关内容
 ```
 etcdctl del --prefix=true /openshift.io
 ```
 
-1. 删除 kubernetes.io
+4. 删除 kubernetes.io
 ```
 etcdctl del --prefix=true /kubernetes.io
 ```
 
-1. 再次查看
+5. 再次查看
 ```
 etcdctl get / --prefix --keys-only
 ```
