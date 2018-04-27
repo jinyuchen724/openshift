@@ -1,10 +1,3 @@
-+++
-title = "Haproxy安装"
-date =  2018-03-30T01:46:28-04:00
-weight = 5
-keywords = "openshift master,架构,docker,部署环境,haproxy"
-+++
-
 | 版本   |   日期   |   状态  | 修订人    |    摘要   |
 | ------ | ----- | ----- | ------- | ------ |
 | V1.0  | 2018-04-17  | 创建  |  开源方案   |    初始版本  |
@@ -14,7 +7,7 @@ keywords = "openshift master,架构,docker,部署环境,haproxy"
 
 | 主机角色 | IP地址 | 操作系统 | 摘要 | 域名 |
 | ---      | -----  | -------- | ---  | ---  |
-| 管理节点(Master)  | openshift-master1(192.168.124.22) | CentOS Linux release 7.3.1611 (Core) x86_64  | master + etcd + haproxy | openshift.ops.com |
+| 管理节点(Master)  | hz01-online-ops-openlb-01(172.16.8.103) | CentOS Linux release 7.3.1611 (Core) x86_64  |  haproxy | openshift.ops.com |
 
 
 ## 安装haproxy
@@ -77,9 +70,9 @@ frontend  atomic-openshift-api
 backend atomic-openshift-api
     balance source
     mode tcp
-    server      master0 192.168.124.22:8443 check
-    server      master1 192.168.124.23:8443 check
-    server      master2 192.168.124.24:8443 check
+    server      master0 172.16.8.40:8443 check
+    server      master1 172.16.8.84:8443 check
+    server      master2 172.16.8.41:8443 check
 ```
 
 **注意: 确保域名 openshift.ops.com 指向Haproxy (如没配置dns,请在各计算节点做hosts绑定)**
