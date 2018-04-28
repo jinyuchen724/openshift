@@ -1,10 +1,3 @@
-+++
-title = "度量系统安装"
-date =  2018-03-30T01:46:28-04:00
-weight = 8
-keywords = "openshift node,架构,docker,部署环境,metric"
-+++
-
 | 版本   |   日期   |   状态  | 修订人    |    摘要   |
 | ------ | ----- | ----- | ------- | ------ |
 | V1.0  | 2018-04-17  | 创建  |  开源方案   |    初始版本  |
@@ -19,15 +12,17 @@ keywords = "openshift node,架构,docker,部署环境,metric"
 
 - 安装openshift ansible 软件包
 ```
-yum install ansible.noarch java-1.8.0-openjdk-headless -y
+[root@hz01-online-ops-openmasteretc-01 /root]# yum install ansible.noarch java-1.8.0-openjdk-headless -y
+[root@hz01-prod-ops-openshiftmaster-01 /opt] wget http://springdale.math.ias.edu/data/puias/unsupported/7/x86_64//python-passlib-1.6.2-2.sdl7.noarch.rpm
+[root@hz01-prod-ops-openshiftmaster-01 /opt] rpm -ivh python-passlib-1.6.2-2.sdl7.noarch.rpm
 ```
 
 - clone openshift-ansible 项目
 
 ```
-cd /opt
-git clone https://github.com/openshift/openshift-ansible.git
-git checkout origin/release-3.6
+[root@hz01-online-ops-openmasteretc-01 /root]# cd /opt
+[root@hz01-online-ops-openmasteretc-01 /root]# git clone https://github.com/openshift/openshift-ansible.git
+[root@hz01-online-ops-openmasteretc-01 /root]# git checkout origin/release-3.6
 ```
 
 - 配置metric_hosts部署文件
@@ -87,7 +82,7 @@ cat /etc/origin/master/master-config.yaml
 
 - 重启master
 ```
-systemct restart origin-master
+systemctl restart origin-master
 ```
 
 ## 成功后查看监控信息
