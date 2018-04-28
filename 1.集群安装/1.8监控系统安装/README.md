@@ -13,8 +13,8 @@
 - 安装openshift ansible 软件包
 ```
 [root@hz01-online-ops-openmasteretc-01 /root]# yum install ansible.noarch java-1.8.0-openjdk-headless -y
-[root@hz01-prod-ops-openshiftmaster-01 /opt] wget http://springdale.math.ias.edu/data/puias/unsupported/7/x86_64//python-passlib-1.6.2-2.sdl7.noarch.rpm
-[root@hz01-prod-ops-openshiftmaster-01 /opt] rpm -ivh python-passlib-1.6.2-2.sdl7.noarch.rpm
+[root@hz01-prod-ops-openshiftmaster-01 /opt]# wget http://springdale.math.ias.edu/data/puias/unsupported/7/x86_64//python-passlib-1.6.2-2.sdl7.noarch.rpm
+[root@hz01-prod-ops-openshiftmaster-01 /opt]# rpm -ivh python-passlib-1.6.2-2.sdl7.noarch.rpm
 ```
 
 - clone openshift-ansible 项目
