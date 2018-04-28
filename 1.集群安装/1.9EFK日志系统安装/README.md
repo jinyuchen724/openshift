@@ -105,6 +105,21 @@ image: docker.io/openshift/origin-logging-elasticsearch:v3.6
 ```
 原因是请查看 https://hub.docker.com/r/openshift/origin-logging-elasticsearch/tags/  v3.6 与 v3.6.1 相比,从更新时间上来说 **v3.6** 属于最新版本
 
+```
+[root@hz01-online-ops-openmasteretc-01 /root]
+# oc logs po/logging-curator-1-deploy 
+--> Scaling logging-curator-1 to 1
+--> Error listing events for replication controller logging-curator-1: Get https://172.30.0.1:443/api/v1/namespaces/logging/events?fieldSelector=involvedObject.kind%3DReplicationController%2CinvolvedObject.name%3Dlogging-curator-1%2CinvolvedObject.namespace%3Dlogging%2CinvolvedObject.uid%3D8c9c7209-4ad6-11e8-bfd6-0607bc000482: dial tcp 172.30.0.1:443: getsockopt: connection refused
+error: couldn't scale logging-curator-1 to 1: watch closed before Until timeout
+
+[root@hz01-online-ops-openmasteretc-01 /root]# oc edit dc/logging-curator
+image: docker.io/openshift/origin-logging-curator:v3.6.1 
+改成
+image: docker.io/openshift/origin-logging-curator:v3.6
+```
+
+
+
 ### 查看es索引情况
 
 进入容器
