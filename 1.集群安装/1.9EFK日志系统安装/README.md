@@ -105,13 +105,6 @@ image: docker.io/openshift/origin-logging-elasticsearch:v3.6
 ```
 原因是请查看 https://hub.docker.com/r/openshift/origin-logging-elasticsearch/tags/  v3.6 与 v3.6.1 相比,从更新时间上来说 **v3.6** 属于最新版本
 
-
-1. 使用开源方案提供的镜像(对比官方，确定稳定版本，打tag到v3.6.1)
-```
-openshift_logging_image_prefix=51knowinfo/origin-
-openshift_logging_image_version=v3.6.1
-```
-
 ### 查看es索引情况
 
 进入容器
