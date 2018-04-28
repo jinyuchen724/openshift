@@ -47,3 +47,51 @@ tomcat9-jkd1.8-s2i/Makefile
 | run | S2I流程生成的最终镜像将以这个脚本作为容器的启动命令 | 
 | usage | 打印帮助信息，一般作为S2I Builder镜像的启动命令 | 
 | save-artifacts | 为了实现增量构建，在构建过程中会执行此脚本保存中间构建产物。此脚本并不是必需的 | 
+
+# 开始项目工作
+## 编写Dockerfile
+
+编写一个制作Tomcat的S2I镜像。Dockerfile的内容如下：
+```
+# tomcat9-jkd1.8-s2i
+FROM centos:7
+
+ENV appname NONE
+ENV env NONE
+ENV url NONE
+#ENV war NONE
+ENV http NONE
+
+LABEL io.openshift.s2i.scripts-url=image:///usr/libexec/s2i \
+    io.k8s.description="Tomcat9 S2I builder" \
+    io.k8s.display-name="tomcat s2i builder 1.0" \
+    io.openshift.expose-services="8080:http" \
+    io.openshift.tags="builder,tomcat9"
+
+RUN mkdir -p /etc/yum.repos.d/
+RUN mkdir -p /usr/local/
+ADD local-mirror.repo /etc/yum.repos.d/
+
+RUN yum -y install curl vim net-tools wget java unzip maven
+
+COPY apache-tomcat-9.0.2.tar.gz /tmp
+
+RUN tar -xvf /tmp/apache-tomcat-9.0.2.tar.gz -C /opt/
+RUN mv /opt/apache-tomcat-9.0.2 /usr/local/tomcat
+
+RUN useradd -m tomcat -u 1001 && chmod -R a+rwx /usr/local/tomcat
+
+RUN chown -R 1001:0 /usr/local/tomcat
+
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+
+COPY ./s2i/bin/ /usr/libexec/s2i
+
+USER 1001
+EXPOSE 8080
+ENTRYPOINT []
+CMD ["usage"]
+```
+注意: 通过**USER 1001**定义了一个新用户，并指定该用户为容器的启动用户。以root用户作为启动用户在某些情况下存在安全风险
+
