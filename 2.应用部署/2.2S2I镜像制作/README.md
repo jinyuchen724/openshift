@@ -47,3 +47,12 @@ tomcat9-jkd1.8-s2i/Makefile
 | run | S2I流程生成的最终镜像将以这个脚本作为容器的启动命令 |
 | usage | 打印帮助信息，一般作为S2I Builder镜像的启动命令 |
 | save-artifacts | 为了实现增量构建，在构建过程中会执行此脚本保存中间构建产物。此脚本并不是必需的 |
+
+
+| 脚本名称 | 功能作用 | 操作系统 | etcd版本 |
+| ---    | -----  |  --- | -------  |
+| assemble | 负责源代码的编译、构建以及构建产出物的部署 | CentOS Linux release 7.3.1611 (Core) x86_64 | etcd-3.2.7-1.el7.x86_64 |
+| run | S2I流程生成的最终镜像将以这个脚本作为容器的启动命令 | CentOS Linux release 7.3.1611 (Core) x86_64 | etcd-3.2.7-1.el7.x86_64 |
+| usage | 打印帮助信息，一般作为S2I Builder镜像的启动命令 | CentOS Linux release 7.3.1611 (Core) x86_64 | etcd-3.2.7-1.el7.x86_64 |
+| save-artifacts | 为了实现增量构建，在构建过程中会执行此脚本保存中间构建产物。此脚本并不是必需的 | CentOS Linux release 7.3.1611 (Core) x86_64 | etcd-3.2.7-1.el7.x86_64 |
+
