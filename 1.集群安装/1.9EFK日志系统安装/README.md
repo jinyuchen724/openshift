@@ -24,7 +24,7 @@ ansible_ssh_user=root
 openshift_deployment_type=origin
 openshift_logging_install_logging=True
 openshift_logging_image_version=v3.6.1
-openshift_logging_kibana_hostname=kibana.ops.com
+openshift_logging_kibana_hostname=kibana.open-prod.ops.com
 #The URL for the Kubernetes master, this does not need to be public facing but should be accessible from within the cluster.
 #default is https://kubernetes.default.svc.cluster.local
 #openshift_logging_master_url=https://openshift.ops.com
@@ -59,6 +59,11 @@ logging-kibana-1-h4rl1                    2/2       Running   0          1d
 ```
 
 至此集中日志功能部署完成
+
+{{% notice note %}} The logs for the default,openshift, and openshift-infra projects are automatically aggregated and grouped into the .operations item in the Kibana interface. The project where you have deployed the EFK stack (logging, as documented here) is not aggregated into .operations and is found under its ID.
+If you set openshift_logging_use_ops to true in your inventory file, Fluentd is configured to split logs between the main Elasticsearch cluster and another cluster reserved for operations logs, which are defined as node system logs and the projects default, openshift, and openshift-infra. {{% /notice %}}
+
+注意: 这里没有配置ops集群,所以基础系统项目的日志从kibana ui上是看不到的
 
 ## 可能碰到的问题
 
@@ -99,3 +104,40 @@ image: docker.io/openshift/origin-logging-elasticsearch:latest
 image: docker.io/openshift/origin-logging-elasticsearch:v3.6
 ```
 原因是请查看 https://hub.docker.com/r/openshift/origin-logging-elasticsearch/tags/  v3.6 与 v3.6.1 相比,从更新时间上来说 **v3.6** 属于最新版本
+
+
+1. 使用开源方案提供的镜像(对比官方，确定稳定版本，打tag到v3.6.1)
+```
+openshift_logging_image_prefix=51knowinfo/origin-
+openshift_logging_image_version=v3.6.1
+```
+
+### 查看es索引情况
+
+进入容器
+```
+oc rsh logging-es-data-master-bhbc13z0-1-hv85d 
+```
+
+查看索引(.operations.* 索引存放的是系统日志)
+
+```
+sh-4.2$ curl -s --cacert /etc/elasticsearch/secret/admin-ca --cert /etc/elasticsearch/secret/admin-cert --key /etc/elasticsearch/secret/admin-key --max-time 30 https://localhost:9200/_cat/indices?v
+health status index                                                           pri rep docs.count docs.deleted store.size pri.store.size
+green  open   .kibana                                                           1   0          1            0      3.1kb          3.1kb
+green  open   .searchguard.logging-es-data-master-im3sye06                      1   0          5            0       32kb           32kb
+green  open   project.cboard.0f516fc0-4870-11e8-86f9-06d28000000c.2018.04.25    1   0       6914            0      2.8mb          2.8mb
+green  open   project.cboard.0f516fc0-4870-11e8-86f9-06d28000000c.2018.04.26    1   0       1328            0    711.9kb        711.9kb
+green  open   project.logging.4abce3a2-4618-11e8-9d6b-06d28000000c.2018.04.25   1   0       7550            0      4.2mb          4.2mb
+green  open   project.logging.4abce3a2-4618-11e8-9d6b-06d28000000c.2018.04.26   1   0       1434            0    993.1kb        993.1kb
+green  open   .operations.2018.04.26                                            1   0       3129            0      1.5mb          1.5mb
+green  open   .kibana.a94a8fe5ccb19ba61c4c0873d391e987982fbbd3                  1   0          2            0     26.2kb         26.2kb
+green  open   .operations.2018.04.25                                            1   0      16708            0      8.4mb          8.4mb
+green  open   .kibana.c62973cc56845b0e473e9e3c40b6e1f0a84662ef                  1   0          2            0     26.2kb         26.2kb
+```
+
+查看系统日志 2018.04.26
+
+```
+sh-4.2$ curl -s --cacert /etc/elasticsearch/secret/admin-ca --cert /etc/elasticsearch/secret/admin-cert --key /etc/elasticsearch/secret/admin-key --max-time 30 https://localhost:9200/.operations.2018.04.26/_search
+```
