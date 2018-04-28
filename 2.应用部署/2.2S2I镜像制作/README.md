@@ -17,7 +17,7 @@
 
 ## 创建项目目录
 
-- 通过s2i create命令创建一个名为tomcat-s2i的S2I Builder镜像。第二个参数ops-tomcat-s2i为S2I Builder镜像名称。第三个参数tomcat-s2i-catalog定义了工作目录的名称。
+- 通过s2i create命令创建一个名为tomcat-s2i的S2I Builder镜像。第二个参数tomcat9-jkd1.8-s2i为S2I Builder镜像名称。第三个参数tomcat9-jkd1.8-s2i定义了工作目录的名称。
 
 ```
 [root@hz01-online-ops-openmasteretc-01 /opt]# s2i create tomcat9-jkd1.8-s2i tomcat9-jkd1.8-s2i
