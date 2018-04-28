@@ -1,10 +1,3 @@
-+++
-title = "EFK日志系统安装"
-date =  2018-03-30T01:46:28-04:00
-weight = 9
-keywords = "openshift node,架构,docker,部署环境,metric"
-+++
-
 | 版本   |   日期   |   状态  | 修订人    |    摘要   |
 | ------ | ----- | ----- | ------- | ------ |
 | V1.0  | 2018-04-17  | 创建  |  开源方案   |    初始版本  |
@@ -38,12 +31,15 @@ openshift_logging_kibana_hostname=kibana.ops.com
 #The public facing URL for the Kubernetes master. This is used for Authentication redirection by the Kibana proxy.
 openshift_logging_master_public_url=https://openshift.ops.com
 openshift_logging_es_memory_limit=1G
-[masters]
-openshift-master
 
+[masters]
+hz01-online-ops-openmasteretc-01
+hz01-online-ops-openmasteretc-02
+hz01-online-ops-openmasteretc-03
 [nodes]
-openshift-node1
-openshift-node2
+hz01-online-ops-opennode-01
+hz01-online-ops-opennode-02
+hz01-online-ops-opennode-03
 ```
 
 - 执行安装日志采集服务
@@ -53,8 +49,7 @@ ansible-playbook -i /etc/ansible/log_hosts /opt/openshift-ansible/playbooks/byo/
 
 - 确认部署是否成功
 ```
-[root@hz01-prod-ops-openshiftmaster-01 /root]
-# oc get pod
+[root@hz01-prod-ops-openshiftmaster-01 /root]# oc get pod
 NAME                                      READY     STATUS    RESTARTS   AGE
 logging-curator-1-01khs                   1/1       Running   0          1d
 logging-es-data-master-f9r7g76t-1-bpvkq   1/1       Running   0          1d
