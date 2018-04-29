@@ -17,26 +17,26 @@
 
 ## 创建项目目录
 
-- 通过s2i create命令创建一个名为tomcat-s2i的S2I Builder镜像。第二个参数tomcat9-jkd1.8-s2i为S2I Builder镜像名称。第三个参数tomcat9-jkd1.8-s2i定义了工作目录的名称。
+- 通过s2i create命令创建一个名为tomcat-s2i的S2I Builder镜像。第二个参数tomcat9-jdk1.8-s2i为S2I Builder镜像名称。第三个参数tomcat9-jdk1.8-s2i定义了工作目录的名称。
 
 ```
-[root@hz01-online-ops-openmasteretc-01 /opt]# s2i create tomcat9-jkd1.8-s2i tomcat9-jkd1.8-s2i
+[root@hz01-online-ops-openmasteretc-01 /opt]# s2i create tomcat9-jdk1.8-s2i tomcat9-jdk1.8-s2i
 
-[root@hz01-online-ops-openmasteretc-01 /opt]# find tomcat9-jkd1.8-s2i/
-tomcat9-jkd1.8-s2i/
-tomcat9-jkd1.8-s2i/s2i
-tomcat9-jkd1.8-s2i/s2i/bin
-tomcat9-jkd1.8-s2i/s2i/bin/assemble
-tomcat9-jkd1.8-s2i/s2i/bin/run
-tomcat9-jkd1.8-s2i/s2i/bin/usage
-tomcat9-jkd1.8-s2i/s2i/bin/save-artifacts
-tomcat9-jkd1.8-s2i/Dockerfile
-tomcat9-jkd1.8-s2i/README.md
-tomcat9-jkd1.8-s2i/test
-tomcat9-jkd1.8-s2i/test/test-app
-tomcat9-jkd1.8-s2i/test/test-app/index.html
-tomcat9-jkd1.8-s2i/test/run
-tomcat9-jkd1.8-s2i/Makefile
+[root@hz01-online-ops-openmasteretc-01 /opt]# find tomcat9-jdk1.8-s2i/
+tomcat9-jdk1.8-s2i/
+tomcat9-jdk1.8-s2i/s2i
+tomcat9-jdk1.8-s2i/s2i/bin
+tomcat9-jdk1.8-s2i/s2i/bin/assemble
+tomcat9-jdk1.8-s2i/s2i/bin/run
+tomcat9-jdk1.8-s2i/s2i/bin/usage
+tomcat9-jdk1.8-s2i/s2i/bin/save-artifacts
+tomcat9-jdk1.8-s2i/Dockerfile
+tomcat9-jdk1.8-s2i/README.md
+tomcat9-jdk1.8-s2i/test
+tomcat9-jdk1.8-s2i/test/test-app
+tomcat9-jdk1.8-s2i/test/test-app/index.html
+tomcat9-jdk1.8-s2i/test/run
+tomcat9-jdk1.8-s2i/Makefile
 ```
 
 - s2i目录下为S2I脚本。
@@ -53,7 +53,7 @@ tomcat9-jkd1.8-s2i/Makefile
 
 编写一个制作Tomcat的S2I镜像。Dockerfile的内容如下：
 ```
-# tomcat9-jkd1.8-s2i
+# tomcat9-jdk1.8-s2i
 FROM centos:7
 
 ENV appname NONE
@@ -96,52 +96,52 @@ CMD ["usage"]
 注意: 通过**USER 1001**定义了一个新用户，并指定该用户为容器的启动用户。以root用户作为启动用户在某些情况下存在安全风险
 
 ```
-[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# make
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# make
 ```
 
 - 安装配置docker-registry
 
 ```
-[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# yum install docker-registry -y
-[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# vim /etc/docker/daemon.json
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# yum install docker-registry -y
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# vim /etc/docker/daemon.json
 {
  "registry-mirrors": ["http://ef017c13.m.daocloud.io"],
  "insecure-registries": [ "172.30.0.0/16","172.30.102.47:5000","hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000"]
 }
-[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# systemctl restart docker
-[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# systemctl restart docker-distribution
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# systemctl restart docker
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# systemctl restart docker-distribution
 ```
 
 - 仓库配置完毕，打好标签后，推送至镜像仓库
 ```
-[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# docker tag tomcat9-jkd1.8-s2i hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i
-[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# docker push hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# docker tag tomcat9-jdk1.8-s2i hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jdk1.8-s2i
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# docker push hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jdk1.8-s2i
 ```
 
 - 通过import-image将镜像导入openshift项目中
 ```
-[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# oc import-image hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i -n openshift --confirm --insecure
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# oc import-image hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jdk1.8-s2i -n openshift --confirm --insecure
 The import completed successfully.
 
-Name:			tomcat9-jkd1.8-s2i
+Name:			tomcat9-jdk1.8-s2i
 Namespace:		openshift
 Created:		Less than a second ago
 Labels:			<none>
 Annotations:		openshift.io/image.dockerRepositoryCheck=2018-04-29T12:26:26Z
-Docker Pull Spec:	172.30.128.130:5000/openshift/tomcat9-jkd1.8-s2i
+Docker Pull Spec:	172.30.128.130:5000/openshift/tomcat9-jdk1.8-s2i
 Image Lookup:		local=false
 Unique Images:		1
 Tags:			1
 
 latest
-  tagged from hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i
+  tagged from hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jdk1.8-s2i
     will use insecure HTTPS or HTTP connections
 
-  * hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i@sha256:d1404fd3a6bfb638b9ecfd7a6cde2c59d3ef63a4fdf10a04678372cf7a373ee4
+  * hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jdk1.8-s2i@sha256:d1404fd3a6bfb638b9ecfd7a6cde2c59d3ef63a4fdf10a04678372cf7a373ee4
       Less than a second ago
 
-Image Name:	tomcat9-jkd1.8-s2i:latest
-Docker Image:	hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i@sha256:d1404fd3a6bfb638b9ecfd7a6cde2c59d3ef63a4fdf10a04678372cf7a373ee4
+Image Name:	tomcat9-jdk1.8-s2i:latest
+Docker Image:	hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jdk1.8-s2i@sha256:d1404fd3a6bfb638b9ecfd7a6cde2c59d3ef63a4fdf10a04678372cf7a373ee4
 Name:		sha256:d1404fd3a6bfb638b9ecfd7a6cde2c59d3ef63a4fdf10a04678372cf7a373ee4
 Created:	Less than a second ago
 Image Size:	506.3 MB (first layer 1.39 kB, last binary layer 73.17 MB)
@@ -167,6 +167,6 @@ Environment:	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 - 查看导入的镜像
 ```
-[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# oc get is -n openshift |grep tomcat
-tomcat9-jkd1.8-s2i   172.30.128.130:5000/openshift/tomcat9-jkd1.8-s2i   latest     27 seconds ago
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# oc get is -n openshift |grep tomcat
+tomcat9-jdk1.8-s2i   172.30.128.130:5000/openshift/tomcat9-jdk1.8-s2i   latest     27 seconds ago
 ```
