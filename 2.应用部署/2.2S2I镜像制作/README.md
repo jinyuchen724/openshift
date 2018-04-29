@@ -95,3 +95,78 @@ CMD ["usage"]
 ```
 注意: 通过**USER 1001**定义了一个新用户，并指定该用户为容器的启动用户。以root用户作为启动用户在某些情况下存在安全风险
 
+```
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# make
+```
+
+- 安装配置docker-registry
+
+```
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# yum install docker-registry -y
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# vim /etc/docker/daemon.json
+{
+ "registry-mirrors": ["http://ef017c13.m.daocloud.io"],
+ "insecure-registries": [ "172.30.0.0/16","172.30.102.47:5000","hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000"]
+}
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# systemctl restart docker
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# systemctl restart docker-distribution
+```
+
+- 仓库配置完毕，打好标签后，推送至镜像仓库
+```
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# docker tag tomcat9-jkd1.8-s2i hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# docker push hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i
+```
+
+- 通过import-image将镜像导入openshift项目中
+```
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# oc import-image hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i -n openshift --confirm --insecure
+The import completed successfully.
+
+Name:			tomcat9-jkd1.8-s2i
+Namespace:		openshift
+Created:		Less than a second ago
+Labels:			<none>
+Annotations:		openshift.io/image.dockerRepositoryCheck=2018-04-29T12:26:26Z
+Docker Pull Spec:	172.30.128.130:5000/openshift/tomcat9-jkd1.8-s2i
+Image Lookup:		local=false
+Unique Images:		1
+Tags:			1
+
+latest
+  tagged from hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i
+    will use insecure HTTPS or HTTP connections
+
+  * hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i@sha256:d1404fd3a6bfb638b9ecfd7a6cde2c59d3ef63a4fdf10a04678372cf7a373ee4
+      Less than a second ago
+
+Image Name:	tomcat9-jkd1.8-s2i:latest
+Docker Image:	hz01-online-ops-openmasteretc-01.sysadmin.xinguangnet.com:5000/tomcat9-jkd1.8-s2i@sha256:d1404fd3a6bfb638b9ecfd7a6cde2c59d3ef63a4fdf10a04678372cf7a373ee4
+Name:		sha256:d1404fd3a6bfb638b9ecfd7a6cde2c59d3ef63a4fdf10a04678372cf7a373ee4
+Created:	Less than a second ago
+Image Size:	506.3 MB (first layer 1.39 kB, last binary layer 73.17 MB)
+Image Created:	3 hours ago
+Author:		<none>
+Arch:		amd64
+Command:	usage
+Working Dir:	<none>
+User:		1001
+Exposes Ports:	8080/tcp
+Docker Labels:	io.k8s.description=Tomcat9 S2I builder
+		io.k8s.display-name=tomcat s2i builder 1.0
+		io.openshift.expose-services=8080:http
+		io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+		io.openshift.tags=builder,tomcat9
+		org.label-schema.schema-version== 1.0     org.label-schema.name=CentOS Base Image     org.label-schema.vendor=CentOS     org.label-schema.license=GPLv2     org.label-schema.build-date=20180402
+Environment:	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+		appname=NONE
+		env=NONE
+		url=NONE
+		http=NONE
+```
+
+- 查看导入的镜像
+```
+[root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jkd1.8-s2i]# oc get is -n openshift |grep tomcat
+tomcat9-jkd1.8-s2i   172.30.128.130:5000/openshift/tomcat9-jkd1.8-s2i   latest     27 seconds ago
+```
