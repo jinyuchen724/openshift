@@ -1,0 +1,49 @@
+[local-centosbase7]
+name=CentOS-7 - Base
+baseurl=http://yum.ops.com/yum/centos/7.3.1611/os/x86_64
+gpgcheck=0
+
+[local-centosplus7]
+name=CentOS-7 - plus
+baseurl=http://yum.ops.com/yum/centos/7.3.1611/centosplus/x86_64
+gpgcheck=0
+
+[local-centosupdates7]
+name=CentOS-7 - updates
+baseurl=http://yum.ops.com/yum/centos/7.3.1611/updates/x86_64
+gpgcheck=0
+
+[local-centosextras7]
+name=CentOS-7 - extras
+baseurl=http://yum.ops.com/yum/centos/7.3.1611/extras/x86_64
+gpgcheck=0
+
+[local-saltstack7]
+name=saltstack-7
+baseurl=http://yum.ops.com/yum/saltstack/2016.11/7/x86_64
+gpgcheck=0
+
+[local-zabbix7]
+name=zabbix-7
+baseurl=http://yum.ops.com/yum/zabbix/3.0/7/x86_64
+gpgcheck=0
+
+[local-mesosphere7]
+name=mesosphere-7
+baseurl=http://yum.ops.com/yum/mesosphere/latest/7/x86_64
+gpgcheck=0
+
+[local-ossec-openvas7]
+name=ossec-openvas-7
+baseurl=http://yum.ops.com/yum/ossec-openvas/latest/7/x86_64
+gpgcheck=0
+
+[local-epel7]
+name=epel-7
+baseurl=http://yum.ops.com/yum/epel/latest/7/x86_64
+gpgcheck=0
+
+[local-ops]
+name=local-ops
+baseurl=http://yum.ops.com/yum/ops
+gpgcheck=0

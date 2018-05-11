@@ -1,0 +1,379 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "annotations": {
+            "iconClass" : "icon-tomcat",
+            "description": "Application template for JavaEE WAR deployment with Tomcat 9 and JDK1.8",
+            "openshift.io/display-name": "Tomcat9-JDK1.8",
+            "tags": "builder,tomcat,java,war",
+            "version": "9.0.2" 
+        },
+        "name": "tomcat9-jdk8",
+        "creationTimestamp": null
+    },
+
+    "parameters": [
+
+        {
+            "description": "您需要部署的git项目地址,如http://git.ops.com/OPS/cmdb.git.",
+            "name": "GIT_ADDRESS",
+            "displayName":"Git地址",
+            "value": "",
+            "required": true
+        },
+
+        {
+            "description": "您需要部署的git项目对应的分支名,开发、测试、生产分别对应develop、release、master.",
+            "name": "GIT_BRANCH",
+            "displayName":"Git分支",
+            "value": "",
+            "required": true
+        },
+
+        {
+            "description": "您需要部署的应用名，需要与git工程名一致，如上述的cmdb.",
+            "name": "APP_NAME",
+            "displayName":"Git应用名",
+            "value": "",
+            "required": true
+        },
+
+        {
+            "description": "您需要部署的环境，开发、接口、功能、性能、预发、生产环境分别对应dev,qaif,qafc,qaxn,pre,online.",
+            "name": "APP_ENV",
+            "displayName":"Git应用所需要部署的环境",
+            "value": "",
+            "required": true
+        },
+
+        {
+            "description": "您需要部署的项目所依赖的配置文件，无需更改.",
+            "name": "APPCONF_URL",
+            "displayName":"Git应用配置/war包下载地址",
+            "value": "http://package.ops.com",
+            "required": true
+        },
+
+        {
+            "description": "您如果需要部署一个打好war包的应用，请直接填写war包的名字，如果不填写，将会自己编译打包.",
+            "name": "APP_WARNAME",
+            "displayName":"Git应用的war包名字",
+            "value": ""
+        }
+    ],
+
+    "objects": [
+
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APP_NAME}",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "${APP_NAME}"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftWebConsole"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "${APP_NAME}"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APP_NAME}",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "${APP_NAME}"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftWebConsole"
+                }
+            },
+            "spec": {
+                "host": "${APP_NAME}.${APP_ENV}.open-prod.ops.com",
+                "to": {
+                    "kind": "Service",
+                    "name": "${APP_NAME}",
+                    "weight": 100
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                },
+                "wildcardPolicy": "None"
+            },
+            "status": {
+                "ingress": [
+                    {
+                        "host": "${APP_NAME}.open-prod.ops.com",
+                        "routerName": "router01",
+                        "conditions": [
+                            {
+                                "type": "Admitted",
+                                "status": "True",
+                                "lastTransitionTime": "2018-01-26T04:38:57Z"
+                            }
+                        ],
+                        "wildcardPolicy": "None"
+                    }
+                ]
+            }
+        },
+
+    {
+        "kind": "ImageStream",
+        "apiVersion": "v1",
+        "metadata": {
+        "name": "${APP_NAME}",
+        "generation": 1,
+        "creationTimestamp": null,
+        "labels": {
+                    "app": "APP_NAME"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftWebConsole"
+                }
+            },
+            "spec": {
+                "lookupPolicy": {
+                    "local": false
+                },
+                "tags": [
+                    {
+                        "name": "latest",
+                        "annotations": null,
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "172.30.128.130:5000/${APP_NAME}:latest"
+                        },
+                        "generation": null,
+                        "importPolicy": {},
+                        "referencePolicy": {
+                        "type": ""
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "dockerImageRepository": ""
+            }
+        },
+
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APP_NAME}",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "${APP_NAME}",
+                    "template": "openshift-tomcat9-jdk8"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftWebConsole"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "d064cbe03e214867"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "d8027d1b504fc578"
+                        }
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "runPolicy": "Serial",
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "${GIT_ADDRESS}",
+                        "ref": "${GIT_BRANCH}"
+                    },
+                    "sourceSecret": {
+                        "name": "git-build"
+                    }
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "openshift",
+                            "name": "tomcat9-jdk1.8-s2i:latest"
+                        },
+                        "env": [
+                            {
+                                "name": "APP_NAME",
+                                "value": "${APP_NAME}"
+                            },
+                            {
+                                "name": "APP_ENV",
+                                "value": "${APP_ENV}"
+                            },
+                            {
+                                "name": "APPCONF_URL",
+                                "value": "${APPCONF_URL}"
+                            },
+                            {
+                                "name": "APP_WARNAME",
+                                "value": "${APP_WARNAME}"
+                            },
+                            {
+                                "name": "GIT_ADDRESS",
+                                "value": "${GIT_ADDRESS}"
+                            },
+                            {
+                                "name": "GIT_BRANCH",
+                                "value": "${GIT_BRANCH}"
+                            },
+                            {
+                                "name": "http",
+                                "value": "8080"
+                            }
+                        ]
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "${APP_NAME}:latest"
+                    }
+                },
+                "resources": {},
+                "postCommit": {},
+                "nodeSelector": null
+            },
+            "status": {
+                "lastVersion": 0
+            }
+        },
+
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APP_NAME}",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "${APP_NAME}"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftWebConsole"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 600,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    },
+                    "resources": {},
+                    "activeDeadlineSeconds": 21600
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "${APP_NAME}"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "${APP_NAME}:latest"
+                            }
+                        }
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "replicas": 1,
+                "test": false,
+                "selector": {
+                    "deploymentconfig": "${APP_NAME}"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "${APP_NAME}",
+                            "deploymentconfig": "${APP_NAME}"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "${APP_NAME}",
+                                "image": "172.30.128.130:5000/${APP_NAME}:latest",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "imagePullPolicy": "Always"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {},
+                        "schedulerName": "default-scheduler"
+                    }
+                }
+            },
+            "status": {
+                "latestVersion": 0,
+                "observedGeneration": 0,
+                "replicas": 0,
+                "updatedReplicas": 0,
+                "availableReplicas": 0,
+                "unavailableReplicas": 0
+            }
+        }
+
+    ]
+}

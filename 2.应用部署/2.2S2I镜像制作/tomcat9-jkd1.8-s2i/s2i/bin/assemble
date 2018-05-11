@@ -1,0 +1,53 @@
+#!/bin/bash -e
+#
+# S2I assemble script for the 'tomcat9-jkd1.8-s2i' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+CLEAN_WEBAPP(){
+
+    rm -rf /opt/app-root/webapps/* 
+
+}
+
+PACKAGE_WAR(){
+
+    if [ -n "$APP_WARNAME" ];then
+        echo "---> 下载二进制代码包..."
+        wget $APPCONF_URL/$APP_NAME/$APP_WARNAME -P /tmp/
+        echo "---> 解压二进制代码包..."
+        unzip /tmp/$APP_WARNAME -d /opt/app-root/tomcat/webapps/ROOT |grep ROOT
+    else
+        cd /tmp/src 
+        mvn clean -Dmaven.test.skip=true package
+        find /tmp/src -type f -name '*.war' |xargs cp -t /tmp
+        #cp /tmp/src/target/$APP_NAME*.war /tmp
+        unzip /tmp/$APP_NAME*.war -d /opt/app-root/tomcat/webapps/ROOT |grep ROOT
+    fi
+}
+
+CHANGE_CONF(){
+    
+    wget -c -r -nd -k -L -np -nH $APPCONF_URL/$APP_NAME/$APP_ENV/disconf/ -P /tmp/disconf && rm -rf /tmp/disconf/index.html
+    wget -c -r -nd -k -L -np -nH $APPCONF_URL/$APP_NAME/$APP_ENV/tomcat/ -P /tmp/tomcat && rm -rf /tmp/disconf/index.html
+    cp -f /tmp/disconf/* /opt/app-root/tomcat/webapps/ROOT/WEB-INF/classes
+    cp -f /tmp/tomcat/server.xml /opt/app-root/tomcat/conf/
+    cp -f /tmp/tomcat/catalina.sh /opt/app-root/tomcat/bin/
+
+    cd /opt/app-root/tomcat/conf
+    sed -i 's/<Connector port="[0-9]*"/<Connector port="'8080'"/g' server.xml
+}
+
+MAIN(){
+
+    CLEAN_WEBAPP
+    PACKAGE_WAR
+    CHANGE_CONF
+}
+
+MAIN
+
+

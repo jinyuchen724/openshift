@@ -1,0 +1,45 @@
+#!/bin/bash -e
+#
+# S2I run script for the 'tomcat9-jkd1.8-s2i' image.
+# The run script executes the server that runs your application.
+#
+# For more information see the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+#appname=$1
+#env=$2
+#url=$3
+##war=$4
+#http=$4
+
+#cd /usr/local/tomcat/webapps
+#rm -rf /usr/local/tomcat/webapps/*
+
+#mv /usr/local/tomcat/$appname*.war /usr/local/tomcat/webapps/ROOT.war
+#rm -rf /usr/local/tomcat/webapps/*
+#wget $url/$appname/$war
+#unzip ROOT.war -d /usr/local/tomcat/webapps/ROOT
+#rm -rf ROOT.war
+
+#wget -c -r -nd -k -L -p -nH $url/$appname/disconf/ -P /tmp/disconf
+#wget -c -r -nd -k -L -p -nH $url/$appname/tomcat/ -P /tmp/tomcat
+
+#cp -f /tmp/disconf/* /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
+
+#cp -f /tmp/tomcat/server.xml /usr/local/tomcat/conf/
+#cp -f /tmp/tomcat/catalina.sh /usr/local/tomcat/bin/
+
+#cd /usr/local/tomcat/conf
+#sed -i 's/<Connector port="[0-9]*"/<Connector port="'$http'"/g' server.xml
+
+#wget -c -r -nd -k -L -np -nH $APPCONF_URL/$APP_NAME/$APP_ENV/disconf/ -P /tmp/disconf && rm -rf /tmp/disconf/index.html
+#wget -c -r -nd -k -L -np -nH $APPCONF_URL/$APP_NAME/$APP_ENV/tomcat/ -P /tmp/tomcat && rm -rf /tmp/disconf/index.html
+#cp -f /tmp/disconf/* /opt/app-root/tomcat/webapps/ROOT/WEB-INF/classes
+#cp -f /tmp/tomcat/server.xml /opt/app-root/tomcat/conf/
+#cp -f /tmp/tomcat/catalina.sh /opt/app-root/tomcat/bin/
+
+#cd /opt/app-root/tomcat/conf
+#sed -i 's/<Connector port="[0-9]*"/<Connector port="'8080'"/g' server.xml
+
+
+bash -c "/opt/app-root/tomcat/bin/catalina.sh run"
