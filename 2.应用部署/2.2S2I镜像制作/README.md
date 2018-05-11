@@ -77,26 +77,27 @@ ENV BUILDER_VERSION 1.0
 COPY apache-tomcat-9.0.2.tar.gz /tmp
 
 RUN tar -xvf /tmp/apache-tomcat-9.0.2.tar.gz -C /opt/
+RUN mkdir -p /opt/app-root
 RUN mv /opt/apache-tomcat-9.0.2 /opt/app-root/tomcat
-
-#RUN useradd -m tomcat -u 1001 && chmod -R a+rwx /usr/local/tomcat
-
-RUN chown -R 1000060000:0 /opt/app-root
-RUN chown -R 1000060000:0 $HOME
 RUN chmod -R 777 /opt/app-root
+RUN chown -R 1001:0 /opt/app-root
 RUN rm -rf /opt/app-root/tomcat/webapps/*
+
 RUN mkdir -p /usr/local/tomcat/logs
-RUN chown -R 1000060000:0 /usr/local/tomcat/logs
+RUN chmod -R 777 /usr/local/tomcat/
+RUN chown -R 1001:0 /usr/local/tomcat/
+
 COPY ./s2i/bin/ /usr/libexec/s2i
 
-USER 1000060000
+USER 1001
 EXPOSE 8080
 #ENTRYPOINT []
 #CMD ["usage"]
 #ADD run.sh /opt/
 CMD ["/usr/libexec/s2i/usage"]
+
 ```
-注意: 通过**USER 1000060000**定义系统用户，并指定该用户为容器的启动用户。以root用户作为启动用户在某些情况下存在安全风险
+注意: 通过**USER 1001**定义系统用户，并指定该用户为容器的启动用户。以root用户作为启动用户在某些情况下存在安全风险
 
 ```
 [root@hz01-online-ops-openmasteretc-01 /opt/openshift/tomcat9-jdk1.8-s2i]# make
